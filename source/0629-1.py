@@ -3,11 +3,14 @@ import random
 w= 400; h= 300
 
 colors = ['white','black','red','blue','green','orange','yellow','cyan','olive','magenta','darkviolet']
+vec = [-2, 0, 2]
 
 class Ball:
     def __init__(self):
-        self.x = 10; self.y = 10    #초기위치
-        self.dx =2; self.dy =2      #방향벡터
+        self.y = 150                 #초기위치
+        self.x = 200
+        self.dx =random.choice(vec)  #방향벡터
+        self.dy =random.choice(vec)
         self.color = random.choice(colors)
 
 class MainGUI:
