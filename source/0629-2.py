@@ -23,7 +23,7 @@ class MainGUI:
         numbers = [eval(s) for s in ex.split()] #[3, 5, 5, 8]
         numbers.sort()
         if fourCards != numbers:
-            messagebox.showinfo('틀림','보여지는 카드를 사용해야 합니다')
+            messagebox.showinfo('틀림','보여지는 카드를 모두 사용해야 합니다')
         else:
             if eval(self.answer.get()) == 24:
                 messagebox.showinfo('맞음','정답!')
@@ -36,7 +36,7 @@ class MainGUI:
         self.index = [i for i in range(52)]  #리스트 내장 문법
         self.imageList = []
         for i in range(1,53): #1,2,3,...,52
-            self.imageList.append(PhotoImage(file='image/card/'+str(i)+'.gif'))
+            self.imageList.append(PhotoImage(file='RC-SW-Games/source/image/card/'+str(i)+'.gif'))
         
         Button(window,text='새로고침',command=self.refresh).pack()
         frame1 = Frame(window)
