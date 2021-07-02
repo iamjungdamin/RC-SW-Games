@@ -2,14 +2,17 @@ import tkinter
 import math
 
 root = tkinter.Tk()
-root.title('삼각함수를 활용한 선 그리기')
-canvas = tkinter.Canvas(width=400,height=400,bg='white')
+root.title('삼각함수를 활용한 도형 그리기')
+canvas = tkinter.Canvas(width=600,height=600,bg='black')
 canvas.pack()
 
-for d in range(0,90,10):    #0,10,20,...80
+COLOR= ['greenyellow','limegreen', 'aquamarine', 'cyan', 'deepskyblue',
+        'blue', 'blueviolet', 'violet']
+
+for d in range(360):
     a=math.radians(d)
-    x = 300*math.cos(a)
-    y = 300*math.sin(a)
-    canvas.create_line(10,10,x,y,fill='blue')
+    x = 250*math.cos(a)
+    y = 250*math.sin(a)
+    canvas.create_line(300,300,300+x,300+y,fill=COLOR[d%8],width=2)
     
 root.mainloop()
