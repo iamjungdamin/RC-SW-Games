@@ -1,4 +1,5 @@
 import tkinter
+import random
 
 key = ''
 koff = False
@@ -27,6 +28,11 @@ pen_y = 90
 pen_d = 0   #펜펜의 방향 변수
 pen_a = 0   #펜펜의 이미지 번호
 
+red_x = 630
+red_y = 450
+red_d = 0
+red_a = 0
+
 map_data = [
     [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
     [0, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 0],
@@ -50,6 +56,7 @@ def draw_screen():
         for x in range(12):
             canvas.create_image(x*60+30,y*60+30,image=img_bg[map_data[y][x]], tag='SCREEN')
     canvas.create_image(pen_x,pen_y,image=img_pen[pen_a],tag='SCREEN')
+    canvas.create_image(red_x,red_y,image=img_red[red_a],tag='SCREEN')
     draw_txt('SCORE '+str(score),180,30,30,'white')
 
 def check_wall(cx,cy,dir,dot):
@@ -124,11 +131,31 @@ def move_penpen():
         score += 100
         map_data[my][mx] = 2    #바닥으로
 
+def move_enemy():
+    global red_x, red_y, red_d, red_a
+    speed = 10
+    if red_x % 60 == 30 and red_y % 60 == 30:
+        red_d = random.randint(0,3)
+    if red_d == DIR_UP:
+        if check_wall(red_x,red_y,red_d,speed) == False:
+            red_y -= speed
+    if red_d == DIR_DOWN:
+        if check_wall(red_x,red_y,red_d,speed) == False:
+            red_y += speed
+    if red_d == DIR_LEFT:
+        if check_wall(red_x,red_y,red_d,speed) == False:
+            red_x -= speed
+    if red_d == DIR_RIGHT:
+        if check_wall(red_x,red_y,red_d,speed) == False:
+            red_x += speed
+    red_a = red_d*3 + ANIMATION[tmr%4]
+
 def main():
     global key, koff, tmr
     tmr += 1
     draw_screen()
     move_penpen()
+    move_enemy()
     # if koff == True:
     #     key = ''
     #     koff = False
@@ -159,6 +186,20 @@ img_pen = [
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen09.png'),
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen10.png'),
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen11.png')
+]
+img_red = [
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red00.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red01.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red02.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red03.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red04.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red05.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red06.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red07.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red08.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red09.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red10.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red11.png')
 ]
 root.bind('<Key>',key_down)
 root.bind('<KeyRelease>',key_up)
