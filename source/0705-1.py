@@ -20,6 +20,7 @@ DIR_LEFT = 2
 DIR_RIGHT = 3
 ANIMATION = [0,1,0,2]
 tmr = 0
+score = 0
 
 pen_x = 90
 pen_y = 90
@@ -38,56 +39,90 @@ map_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]   #9행 12열
 
+def draw_txt(txt,x,y,siz,col):
+    fnt = ('Times New Roman', siz, 'bold')
+    canvas.create_text(x+2,y+2,text=txt,fill='black',font=fnt,tag='SCREEN') #문자열 그림자
+    canvas.create_text(x,y,text=txt,fill=col,font=fnt,tag='SCREEN') #문자열
+
 def draw_screen():
     canvas.delete('SCREEN')
     for y in range(9):
         for x in range(12):
             canvas.create_image(x*60+30,y*60+30,image=img_bg[map_data[y][x]], tag='SCREEN')
     canvas.create_image(pen_x,pen_y,image=img_pen[pen_a],tag='SCREEN')
+    draw_txt('SCORE '+str(score),180,30,30,'white')
 
-def check_wall(cx,cy,dir):
+def check_wall(cx,cy,dir,dot):
+    #dot은 한번에 움직이는 픽셀 크기
     chk = False
 
     if dir == DIR_UP:
         #픽셀 좌표를 맵데이터 좌표로 변환
-        mx = cx // 60
-        my = (cy-60) // 60
+        #좌상,우상
+        mx = (cx-30) // 60
+        my = (cy-30-dot) // 60
+        if map_data[my][mx] <= 1:   #맵데이터 0,1은 벽
+            chk = True
+        mx = (cx+29) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
 
     if dir == DIR_DOWN:
-        mx = cx // 60
-        my = (cy+60) // 60
+        #좌하,우하
+        mx = (cx-30) // 60
+        my = (cy+29+dot) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
+        mx = (cx+29) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
 
     if dir == DIR_LEFT:
-        mx = (cx-60) // 60
-        my = cy // 60
+        #좌상,좌하
+        mx = (cx-30-dot) // 60
+        my = (cy-30) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
+        my = (cy+29) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
 
     if dir == DIR_RIGHT:
-        mx = (cx+60) // 60
-        my = cy // 60
-    
-    if map_data[my][mx] <= 1:   #맵데이터 0,1은 벽
-        chk = True
+        #우상,우하
+        mx = (cx+29+dot) // 60
+        my = (cy-30) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
+        my = (cy+29) // 60
+        if map_data[my][mx] <= 1:
+            chk = True
+
     return chk
 
 def move_penpen():
-    global pen_x, pen_y, pen_d, pen_a
+    global pen_x, pen_y, pen_d, pen_a, score
     if key == 'Up':
         pen_d = DIR_UP
-        if check_wall(pen_x,pen_y,pen_d) == False:
-            pen_y -= 60
+        if check_wall(pen_x,pen_y,pen_d,20) == False:
+            pen_y -= 20
     if key == 'Down':
         pen_d = DIR_DOWN
-        if check_wall(pen_x,pen_y,pen_d) == False:
-            pen_y += 60
+        if check_wall(pen_x,pen_y,pen_d,20) == False:
+            pen_y += 20
     if key == 'Left':
         pen_d = DIR_LEFT
-        if check_wall(pen_x,pen_y,pen_d) == False:
-            pen_x -= 60
+        if check_wall(pen_x,pen_y,pen_d,20) == False:
+            pen_x -= 20
     if key == 'Right':
         pen_d = DIR_RIGHT
-        if check_wall(pen_x,pen_y,pen_d) == False:
-            pen_x += 60
+        if check_wall(pen_x,pen_y,pen_d,20) == False:
+            pen_x += 20
     pen_a = pen_d*3 + ANIMATION[tmr%4]  #0,1,2,3 -> 0,3,6,9(방향) -> 0,1,0,2(인덱스)만큼 더해줌
+    mx = pen_x // 60
+    my = pen_y // 60
+    if map_data[my][mx] == 3:   #사탕먹으면
+        score += 100
+        map_data[my][mx] = 2    #바닥으로
 
 def main():
     global key, koff, tmr
@@ -97,7 +132,7 @@ def main():
     # if koff == True:
     #     key = ''
     #     koff = False
-    root.after(300,main)
+    root.after(100,main)
 
 root = tkinter.Tk()
 root.title('아슬아슬 펭귄 미로')
