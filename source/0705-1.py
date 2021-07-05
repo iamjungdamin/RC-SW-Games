@@ -9,16 +9,22 @@ def key_down(e):
     koff = False
 
 def key_up(e):
-    global koff
-    koff = True
+    # global koff
+    # koff = True
+    global key
+    key = ''
 
 DIR_UP = 0
 DIR_DOWN = 1
 DIR_LEFT = 2
 DIR_RIGHT = 3
+ANIMATION = [0,1,0,2]
+tmr = 0
 
 pen_x = 90
 pen_y = 90
+pen_d = 0   #펜펜의 방향 변수
+pen_a = 0   #펜펜의 이미지 번호
 
 map_data = [
     [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
@@ -37,7 +43,7 @@ def draw_screen():
     for y in range(9):
         for x in range(12):
             canvas.create_image(x*60+30,y*60+30,image=img_bg[map_data[y][x]], tag='SCREEN')
-    canvas.create_image(pen_x,pen_y,image=img_pen,tag='SCREEN')
+    canvas.create_image(pen_x,pen_y,image=img_pen[pen_a],tag='SCREEN')
 
 def check_wall(cx,cy,dir):
     chk = False
@@ -64,27 +70,33 @@ def check_wall(cx,cy,dir):
     return chk
 
 def move_penpen():
-    global pen_x, pen_y
+    global pen_x, pen_y, pen_d, pen_a
     if key == 'Up':
-        if check_wall(pen_x,pen_y,DIR_UP) == False:
+        pen_d = DIR_UP
+        if check_wall(pen_x,pen_y,pen_d) == False:
             pen_y -= 60
     if key == 'Down':
-        if check_wall(pen_x,pen_y,DIR_DOWN) == False:
+        pen_d = DIR_DOWN
+        if check_wall(pen_x,pen_y,pen_d) == False:
             pen_y += 60
     if key == 'Left':
-        if check_wall(pen_x,pen_y,DIR_LEFT) == False:
+        pen_d = DIR_LEFT
+        if check_wall(pen_x,pen_y,pen_d) == False:
             pen_x -= 60
     if key == 'Right':
-        if check_wall(pen_x,pen_y,DIR_RIGHT) == False:
+        pen_d = DIR_RIGHT
+        if check_wall(pen_x,pen_y,pen_d) == False:
             pen_x += 60
+    pen_a = pen_d*3 + ANIMATION[tmr%4]  #0,1,2,3 -> 0,3,6,9(방향) -> 0,1,0,2(인덱스)만큼 더해줌
 
 def main():
-    global key, koff
+    global key, koff, tmr
+    tmr += 1
     draw_screen()
     move_penpen()
-    if koff == True:
-        key = ''
-        koff = False
+    # if koff == True:
+    #     key = ''
+    #     koff = False
     root.after(300,main)
 
 root = tkinter.Tk()
@@ -99,7 +111,20 @@ img_bg = [
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/chip02.png'),    #바닥
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/chip03.png')     #캔디
 ]
-img_pen = tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen03.png')
+img_pen = [
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen00.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen01.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen02.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen03.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen04.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen05.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen06.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen07.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen08.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen09.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen10.png'),
+    tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/pen11.png')
+]
 root.bind('<Key>',key_down)
 root.bind('<KeyRelease>',key_up)
 main()
