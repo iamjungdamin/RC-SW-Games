@@ -20,30 +20,47 @@ DIR_DOWN = 1
 DIR_LEFT = 2
 DIR_RIGHT = 3
 ANIMATION = [0,1,0,2]
+idx = 0     # 0 타이틀, 1 게임중, 2 게임오버, 3 클리어
 tmr = 0
 score = 0
+candy = 0
 
-pen_x = 90
-pen_y = 90
+pen_x = 0
+pen_y = 0
 pen_d = 0   #펜펜의 방향 변수
 pen_a = 0   #펜펜의 이미지 번호
 
-red_x = 630
-red_y = 450
+red_x = 0
+red_y = 0
 red_d = 0
 red_a = 0
 
-map_data = [
-    [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
-    [0, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 0],
-    [0, 3, 0, 0, 3, 3, 3, 3, 0, 0, 3, 0],
-    [0, 3, 1, 1, 3, 0, 0, 3, 1, 1, 3, 0],
-    [0, 3, 2, 2, 3, 0, 0, 3, 2, 2, 3, 0],
-    [0, 3, 0, 0, 3, 1, 1, 3, 0, 0, 3, 0],
-    [0, 3, 1, 1, 3, 3, 3, 3, 1, 1, 3, 0],
-    [0, 2, 3, 3, 2, 0, 0, 2, 3, 3, 2, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-]   #9행 12열
+map_data = []
+
+def set_stage():
+    global map_data, candy
+    map_data = [
+        [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
+        [0, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 0],
+        [0, 3, 0, 0, 3, 3, 3, 3, 0, 0, 3, 0],
+        [0, 3, 1, 1, 3, 0, 0, 3, 1, 1, 3, 0],
+        [0, 3, 2, 2, 3, 0, 0, 3, 2, 2, 3, 0],
+        [0, 3, 0, 0, 3, 1, 1, 3, 0, 0, 3, 0],
+        [0, 3, 1, 1, 3, 3, 3, 3, 1, 1, 3, 0],
+        [0, 2, 3, 3, 2, 0, 0, 2, 3, 3, 2, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]   #9행 12열
+    candy = 32
+
+def set_char_pos():
+    global pen_x,pen_y,pen_d,pen_a
+    global red_x,red_y,red_d,red_a
+    pen_x, pen_y = 90, 90
+    pen_d = DIR_DOWN
+    pen_a = 3
+    red_x, red_y = 630, 450
+    red_d = DIR_DOWN
+    red_a = 3
 
 def draw_txt(txt,x,y,siz,col):
     fnt = ('Times New Roman', siz, 'bold')
@@ -107,7 +124,7 @@ def check_wall(cx,cy,dir,dot):
     return chk
 
 def move_penpen():
-    global pen_x, pen_y, pen_d, pen_a, score
+    global pen_x, pen_y, pen_d, pen_a, score, candy
     if key == 'Up':
         pen_d = DIR_UP
         if check_wall(pen_x,pen_y,pen_d,20) == False:
@@ -130,12 +147,24 @@ def move_penpen():
     if map_data[my][mx] == 3:   #사탕먹으면
         score += 100
         map_data[my][mx] = 2    #바닥으로
+        candy -= 1
 
 def move_enemy():
+    global idx, tmr
     global red_x, red_y, red_d, red_a
     speed = 10
     if red_x % 60 == 30 and red_y % 60 == 30:
-        red_d = random.randint(0,3)
+        red_d = random.randint(0,6)
+        if red_d >= 4:  #펜펜을 따라간다
+            if pen_y < red_y:
+                red_d = DIR_UP
+            if pen_y > red_y:
+                red_d = DIR_DOWN
+            if pen_x < red_x:
+                red_d = DIR_LEFT
+            if pen_x > red_x:
+                red_d < DIR_RIGHT
+
     if red_d == DIR_UP:
         if check_wall(red_x,red_y,red_d,speed) == False:
             red_y -= speed
@@ -150,22 +179,48 @@ def move_enemy():
             red_x += speed
     red_a = red_d*3 + ANIMATION[tmr%4]
 
+    if abs(red_x-pen_x) <= 40 and abs(red_y-pen_y) <= 40:
+        idx = 2     #게임종료
+        tmr = 0
+
 def main():
-    global key, koff, tmr
+    global key, koff, idx, tmr, score
     tmr += 1
     draw_screen()
-    move_penpen()
-    move_enemy()
+    
+    if idx == 0:
+        canvas.create_image(360,200,image=img_title,tag='SCREEN')
+        if tmr%10 < 5:
+            draw_txt('Press Space !!', 360, 380, 30, 'yellow')
+        if key == 'space':
+            score = 0
+            set_stage()
+            set_char_pos()
+            idx = 1
+
+    if idx == 1:
+        move_penpen()
+        move_enemy()
+        if candy == 0:
+            idx = 3
+            tmr = 0
+
+    if idx == 2:
+        draw_txt('GAME OVER', 360, 270, 40, 'red')
+        if tmr == 50:
+            idx = 0
+
+    if idx == 3:
+        draw_txt('STAGE CLAER', 360, 270, 40, 'pink')
+        if tmr == 50:
+            idx = 0
+
     # if koff == True:
     #     key = ''
     #     koff = False
     root.after(100,main)
 
 root = tkinter.Tk()
-root.title('아슬아슬 펭귄 미로')
-root.resizable(False,False)
-canvas = tkinter.Canvas(width=720,height=540)
-canvas.pack()
 
 img_bg = [
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/chip00.png'),    #벽
@@ -201,7 +256,15 @@ img_red = [
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red10.png'),
     tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/red11.png')
 ]
+img_title = tkinter.PhotoImage(file='RC-SW-Games/source/pracImage/Chapter3/image_penpen/title.png')
+
+root.title('아슬아슬 펭귄 미로')
+root.resizable(False,False)
+canvas = tkinter.Canvas(width=720,height=540)
+canvas.pack()
 root.bind('<Key>',key_down)
 root.bind('<KeyRelease>',key_up)
+set_stage()
+set_char_pos()
 main()
 root.mainloop()
