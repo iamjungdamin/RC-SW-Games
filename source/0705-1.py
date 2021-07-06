@@ -20,8 +20,10 @@ DIR_DOWN = 1
 DIR_LEFT = 2
 DIR_RIGHT = 3
 ANIMATION = [0,1,0,2]
+
 idx = 0     # 0 타이틀, 1 게임중, 2 게임오버, 3 클리어
 tmr = 0
+stage = 1
 score = 0
 candy = 0
 
@@ -34,31 +36,71 @@ red_x = 0
 red_y = 0
 red_d = 0
 red_a = 0
+red_sx = 0
+red_sy = 0
 
 map_data = []
 
 def set_stage():
     global map_data, candy
-    map_data = [
-        [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
-        [0, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 0],
-        [0, 3, 0, 0, 3, 3, 3, 3, 0, 0, 3, 0],
-        [0, 3, 1, 1, 3, 0, 0, 3, 1, 1, 3, 0],
-        [0, 3, 2, 2, 3, 0, 0, 3, 2, 2, 3, 0],
-        [0, 3, 0, 0, 3, 1, 1, 3, 0, 0, 3, 0],
-        [0, 3, 1, 1, 3, 3, 3, 3, 1, 1, 3, 0],
-        [0, 2, 3, 3, 2, 0, 0, 2, 3, 3, 2, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]   #9행 12열
-    candy = 32
+    global red_sx, red_sy
+
+    if stage == 1:
+        map_data = [
+            [0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
+            [0, 2, 3, 3, 2, 1, 1, 2, 3, 3, 2, 0],
+            [0, 3, 0, 0, 3, 3, 3, 3, 0, 0, 3, 0],
+            [0, 3, 1, 1, 3, 0, 0, 3, 1, 1, 3, 0],
+            [0, 3, 2, 2, 3, 0, 0, 3, 2, 2, 3, 0],
+            [0, 3, 0, 0, 3, 1, 1, 3, 0, 0, 3, 0],
+            [0, 3, 1, 1, 3, 3, 3, 3, 1, 1, 3, 0],
+            [0, 2, 3, 3, 2, 0, 0, 2, 3, 3, 2, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]   #9행 12열
+        candy = 32
+        red_sx = 630
+        red_sy = 450
+
+    if stage == 2:
+        map_data = [
+            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 0],
+            [0, 3, 3, 0, 2, 1, 1, 2, 0, 3, 3, 0],
+            [0, 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 0],
+            [0, 2, 1, 3, 3, 3, 3, 3, 3, 1, 2, 0],
+            [0, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 0],
+            [0, 3, 3, 1, 2, 1, 1, 2, 1, 3, 3, 0],
+            [0, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        candy = 38
+        red_sx = 630
+        red_sy = 90
+
+    if stage == 3:
+        map_data = [
+            [0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+            [0, 2, 1, 3, 1, 2, 2, 3, 3, 3, 3, 0],
+            [0, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 0],
+            [0, 2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 0],
+            [0, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 0],
+            [0, 1, 1, 2, 0, 2, 2, 0, 1, 1, 2, 0],
+            [0, 3, 3, 3, 1, 1, 1, 0, 3, 3, 3, 0],
+            [0, 3, 3, 3, 2, 2, 2, 0, 3, 3, 3, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        candy = 23
+        red_sx = 630
+        red_sy = 450
 
 def set_char_pos():
     global pen_x,pen_y,pen_d,pen_a
     global red_x,red_y,red_d,red_a
+    global red_sx, red_sy
     pen_x, pen_y = 90, 90
     pen_d = DIR_DOWN
     pen_a = 3
-    red_x, red_y = 630, 450
+    red_x, red_y = red_sx, red_sy
     red_d = DIR_DOWN
     red_a = 3
 
@@ -75,6 +117,7 @@ def draw_screen():
     canvas.create_image(pen_x,pen_y,image=img_pen[pen_a],tag='SCREEN')
     canvas.create_image(red_x,red_y,image=img_red[red_a],tag='SCREEN')
     draw_txt('SCORE '+str(score),180,30,30,'white')
+    draw_txt('STAGE '+str(stage),520,30,30,'lime')
 
 def check_wall(cx,cy,dir,dot):
     #dot은 한번에 움직이는 픽셀 크기
@@ -184,7 +227,7 @@ def move_enemy():
         tmr = 0
 
 def main():
-    global key, koff, idx, tmr, score
+    global key, koff, idx, tmr, stage, score
     tmr += 1
     draw_screen()
     
@@ -193,6 +236,7 @@ def main():
         if tmr%10 < 5:
             draw_txt('Press Space !!', 360, 380, 30, 'yellow')
         if key == 'space':
+            stage = 1
             score = 0
             set_stage()
             set_char_pos()
@@ -211,9 +255,18 @@ def main():
             idx = 0
 
     if idx == 3:
-        draw_txt('STAGE CLAER', 360, 270, 40, 'pink')
-        if tmr == 50:
-            idx = 0
+        if stage < 3:
+            draw_txt('STAGE CLAER', 360, 270, 40, 'pink')
+        else:
+            draw_txt('ALL STAGE CLAER', 360, 270, 40, 'violet')
+        if tmr == 30:
+            if stage < 3:
+                stage += 1
+                set_stage()
+                set_char_pos()
+                idx = 1
+            else:
+                idx = 0
 
     # if koff == True:
     #     key = ''
