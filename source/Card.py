@@ -15,6 +15,3 @@ class Card:
             return 10
         else:
             return self.value
-
-import random
-c = Card(random.randint(0,51))
